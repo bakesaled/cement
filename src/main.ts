@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { CryptoService } from './crypto/crypto.service';
+import { FileService } from './file/file.service';
+import * as path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,5 +19,12 @@ async function bootstrap() {
     encryptedValue,
   );
   console.log('dec', decryptedValue);
+
+  const file = await app.get(FileService);
+  const filePath = path.join(__dirname, 'test-file.txt');
+  console.log('creating file', filePath);
+  await file.create(password, filePath, 'hello');
+  const resultFile = await file.decryptFile(password, filePath + '.enc');
+  console.log('decrypted file', resultFile);
 }
 bootstrap();

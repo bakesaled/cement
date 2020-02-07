@@ -44,8 +44,8 @@ describe('CryptoService', () => {
       hash,
       value,
     );
-    const hashPart = service.extractHashPart(hash);
-    const decryptedValue = await service.decrypt(hashPart, encryptedValue);
+
+    const decryptedValue = await service.decrypt(hash, encryptedValue);
     expect(decryptedValue).toBe(value);
   });
 });

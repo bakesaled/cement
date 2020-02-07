@@ -30,7 +30,7 @@ export class CryptoService {
     return new Promise((resolve, reject) => {
       try {
         const iv = crypto.randomBytes(config.IV_LENGTH);
-        const hashPart = this.extractHashPart(hash);
+        const hashPart = EncryptedValueModel.extractHashPart(hash);
 
         const cipher = crypto.createCipheriv(
           config.CIPHER_ALGORITHM,
@@ -44,7 +44,7 @@ export class CryptoService {
         );
         result += cipher.final(config.BASE64_ENCODING);
         const tag = (cipher as any).getAuthTag();
-        resolve(new EncryptedValueModel(hashPart, iv, tag, result));
+        resolve(new EncryptedValueModel(hash, iv, tag, result));
       } catch (e) {
         reject(e);
       }
@@ -58,23 +58,26 @@ export class CryptoService {
         const tag = encryptedValue.tagAsBuffer;
         const decipher = crypto.createDecipheriv(
           config.CIPHER_ALGORITHM,
-          Buffer.from(hash, config.BASE64_ENCODING),
+          Buffer.from(
+            EncryptedValueModel.extractHashPart(hash),
+            config.BASE64_ENCODING,
+          ),
           iv,
         );
         (decipher as any).setAuthTag(tag);
         decipher.on('error', err => {
           reject(err);
         });
-        let result = decipher.update(encryptedValue.value, 'base64', 'utf8');
+        let result = decipher.update(
+          encryptedValue.value,
+          config.BASE64_ENCODING,
+          config.UTF8_ENCODING,
+        );
         result += decipher.final(config.UTF8_ENCODING);
         resolve(result.toString());
       } catch (e) {
         reject(e);
       }
     });
-  }
-
-  public extractHashPart(argon2iHash: string) {
-    return argon2iHash.split(',')[2].split('$')[2];
   }
 }
