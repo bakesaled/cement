@@ -24,6 +24,7 @@ async function bootstrap() {
   const filePath = path.join(__dirname, 'test-file.txt');
   console.log('creating file', filePath);
   await file.create(password, filePath, 'hello');
+  console.log('file created');
   const resultFile = await file.decryptFile(password, filePath + '.enc');
   console.log('decrypted file', resultFile);
 }

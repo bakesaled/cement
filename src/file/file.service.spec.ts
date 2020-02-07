@@ -4,6 +4,7 @@ import { CryptoService } from '../crypto/crypto.service';
 import * as mock from 'mock-fs';
 import * as path from 'path';
 import * as fs from 'fs-extra';
+import { gzip, ungzip } from 'node-gzip';
 
 describe('FileService', () => {
   let service: FileService;
@@ -48,11 +49,12 @@ describe('FileService', () => {
     const password = 'skeleton';
     await service.create(password, filePath, content);
     const fileContent = await fs.readFile(filePath + '.enc');
-    const invalidFileContent = fileContent
+    const unzippedFileContent = await ungzip(fileContent);
+    const invalidFileContent = unzippedFileContent
       .toString('utf-8')
       .replace('cement#', 'nope');
-    // process.stdout.write(invalidFileContent);
-    await fs.writeFile(filePath + '.enc', invalidFileContent);
+    const zippedInvalidFileContent = await gzip(invalidFileContent);
+    await fs.writeFile(filePath + '.enc', zippedInvalidFileContent);
     let error;
     try {
       await service.decryptFile(password, filePath + '.enc');

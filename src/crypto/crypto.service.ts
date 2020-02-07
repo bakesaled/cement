@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-// import * as argon2 from 'argon2-ffi';
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
 import { EncryptedValueModel } from './encrypted-value.model';

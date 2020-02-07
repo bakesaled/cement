@@ -4,6 +4,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { EncryptedValueModel } from '../crypto/encrypted-value.model';
 import { config } from '../config';
+import { gzip, ungzip } from 'node-gzip';
 
 @Injectable()
 export class FileService {
@@ -24,18 +25,20 @@ export class FileService {
     const hash = await this.cryptoService.generateHash(password);
     const encryptedValue = await this.cryptoService.encrypt(hash, content);
 
-    const readStream = await fs.createReadStream(filePath);
     const writeStream = await fs.createWriteStream(
       path.join(filePath + '.enc'),
     );
-    writeStream.write(encryptedValue.toString());
+    const zipped = await gzip(encryptedValue.toString());
+    writeStream.write(zipped);
     writeStream.end();
-    readStream.pipe(writeStream);
   }
 
   async decryptFile(password: string, filePath: string) {
-    const data = await fs.readFile(filePath, config.UTF8_FILE_ENCODING);
-    const encryptedValue = EncryptedValueModel.fromString(data);
+    const data = await fs.readFile(filePath);
+    const unzippedData = await ungzip(data);
+    const encryptedValue = EncryptedValueModel.fromString(
+      unzippedData.toString(config.UTF8_ENCODING),
+    );
     const valid = await this.cryptoService.verifyHash(
       encryptedValue.hash,
       password,
@@ -45,7 +48,9 @@ export class FileService {
     }
     return await this.cryptoService.decrypt(
       encryptedValue.hash,
-      EncryptedValueModel.fromString(data),
+      EncryptedValueModel.fromString(
+        unzippedData.toString(config.UTF8_FILE_ENCODING),
+      ),
     );
   }
 }
