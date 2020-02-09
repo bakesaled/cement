@@ -5,6 +5,8 @@ interface EncryptedValue {
   value: string;
 }
 export class EncryptedValueModel implements EncryptedValue {
+  static readonly newLine = '\n';
+  static readonly separator = '#';
   hash: string;
   iv: string;
   tag: string;
@@ -23,6 +25,15 @@ export class EncryptedValueModel implements EncryptedValue {
 
   public get hashPart() {
     return EncryptedValueModel.extractHashPart(this.hash);
+  }
+
+  public get header() {
+    return (
+      `cement${EncryptedValueModel.separator}${this.iv}` +
+      `${EncryptedValueModel.separator}${this.tag}` +
+      `${EncryptedValueModel.separator}${this.hash}` +
+      `${EncryptedValueModel.separator}`
+    );
   }
 
   constructor(hash: string, iv: Buffer, tag: Buffer, value: string) {
@@ -63,6 +74,6 @@ export class EncryptedValueModel implements EncryptedValue {
   }
 
   public toString() {
-    return `cement#${this.iv}#${this.tag}#${this.hash}#${this.value}`;
+    return `${this.header}${EncryptedValueModel.newLine}${this.value}`;
   }
 }

@@ -2,55 +2,64 @@ import { Injectable } from '@nestjs/common';
 import { CryptoService } from '../crypto/crypto.service';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { EncryptedValueModel } from '../crypto/encrypted-value.model';
-import { config } from '../config';
-import { gzip, ungzip } from 'node-gzip';
+import * as zlib from 'zlib';
+import { EncryptTransform } from '../crypto/encrypt.transform';
+import { DecryptTransform } from '../crypto/decrypt.transform';
+import { Readable } from 'stream';
 
 @Injectable()
 export class FileService {
   constructor(private cryptoService: CryptoService) {}
   async create(password: string, filePath: string, content: string) {
-    await fs.createFile(filePath);
-    await this.encryptFile(password, filePath, content);
+    const resultStream = new Readable();
+    resultStream.push(content);
+    resultStream.push(null);
+    await this.encryptToFile(password, filePath, resultStream);
   }
 
-  async encryptFile(password: string, filePath: string, content?: string) {
-    if (!(await fs.pathExists(filePath))) {
-      throw Error(`File does not exist at path: ${filePath}`);
-    }
-    if (content === null) {
-      const contentBuffer = await fs.readFile(filePath);
-      content = contentBuffer.toString(config.UTF8_FILE_ENCODING);
-    }
-    const hash = await this.cryptoService.generateHash(password);
-    const encryptedValue = await this.cryptoService.encrypt(hash, content);
-
-    const writeStream = await fs.createWriteStream(
-      path.join(filePath + '.enc'),
-    );
-    const zipped = await gzip(encryptedValue.toString());
-    writeStream.write(zipped);
-    writeStream.end();
+  async encryptExistingFile(password: string, filePath: string) {
+    const readStream = fs.createReadStream(filePath);
+    await this.encryptToFile(password, filePath, readStream);
   }
 
   async decryptFile(password: string, filePath: string) {
-    const data = await fs.readFile(filePath);
-    const unzippedData = await ungzip(data);
-    const encryptedValue = EncryptedValueModel.fromString(
-      unzippedData.toString(config.UTF8_ENCODING),
-    );
-    const valid = await this.cryptoService.verifyHash(
-      encryptedValue.hash,
-      password,
-    );
-    if (!valid) {
-      throw Error('Invalid password');
-    }
-    return await this.cryptoService.decrypt(
-      encryptedValue.hash,
-      EncryptedValueModel.fromString(
-        unzippedData.toString(config.UTF8_FILE_ENCODING),
-      ),
-    );
+    return new Promise((resolve, reject) => {
+      let decryptedData = '';
+      const readStream = fs.createReadStream(filePath);
+      const unzip = zlib.createGunzip();
+      readStream
+        .pipe(unzip)
+        .pipe(new DecryptTransform(this.cryptoService))
+        .on('data', (data: string) => {
+          decryptedData += data;
+        })
+        .on('error', e => {
+          reject(e);
+        })
+        .on('finish', () => {
+          resolve(decryptedData);
+        });
+    });
+  }
+
+  private async encryptToFile(
+    password: string,
+    filePath: string,
+    stream: Readable,
+  ) {
+    const hash = await this.cryptoService.generateHash(password);
+    return new Promise((resolve, reject) => {
+      const encryptTransform = new EncryptTransform(this.cryptoService, hash);
+      const writeStream = fs.createWriteStream(path.join(filePath + '.enc'));
+      stream
+        // .pipe(resultStream)
+        .pipe(encryptTransform)
+        .pipe(zlib.createGzip())
+        .pipe(writeStream)
+        .on('error', e => reject(e))
+        .on('finish', () => {
+          resolve();
+        });
+    });
   }
 }

@@ -25,7 +25,11 @@ async function bootstrap() {
   console.log('creating file', filePath);
   await file.create(password, filePath, 'hello');
   console.log('file created');
-  const resultFile = await file.decryptFile(password, filePath + '.enc');
-  console.log('decrypted file', resultFile);
+  try {
+    const resultFile = await file.decryptFile(password, filePath + '.enc');
+    console.log('decrypted file', resultFile);
+  } catch (e) {
+    console.log('error decrypting', e);
+  }
 }
 bootstrap();
