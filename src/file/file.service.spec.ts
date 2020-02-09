@@ -5,6 +5,7 @@ import * as mock from 'mock-fs';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as zlib from 'zlib';
+import { config } from '../config';
 
 describe('FileService', () => {
   let service: FileService;
@@ -13,7 +14,7 @@ describe('FileService', () => {
   beforeEach(async () => {
     mock({
       temp: {
-        'test-file.cmt': 'test-file',
+        'super-test-file.cmt': 'test-file',
       },
     });
     tempPath = path.join('temp');
@@ -39,7 +40,10 @@ describe('FileService', () => {
     const content = 'batman';
     const password = 'skeleton';
     await service.create(password, filePath, content);
-    const result = await service.decryptFile(password, filePath + '.enc');
+    const result = await service.decryptFile(
+      password,
+      filePath + config.FILE_EXTENSION,
+    );
     expect(result).toEqual(content);
   });
 
@@ -49,7 +53,10 @@ describe('FileService', () => {
     await fs.writeFile(filePath, content);
     const password = 'skeleton';
     await service.encryptExistingFile(password, filePath);
-    const result = await service.decryptFile(password, filePath + '.enc');
+    const result = await service.decryptFile(
+      password,
+      filePath + config.FILE_EXTENSION,
+    );
     expect(result).toEqual(content);
   });
 
@@ -58,16 +65,19 @@ describe('FileService', () => {
     const content = 'batman';
     const password = 'skeleton';
     await service.create(password, filePath, content);
-    const fileContent = await fs.readFile(filePath + '.enc');
+    const fileContent = await fs.readFile(filePath + config.FILE_EXTENSION);
     const unzippedFileContent = zlib.gunzipSync(fileContent);
     const invalidFileContent = unzippedFileContent
       .toString('utf-8')
       .replace('cement#', 'nope');
     const zippedInvalidFileContent = zlib.gzipSync(invalidFileContent);
-    await fs.writeFile(filePath + '.enc', zippedInvalidFileContent);
+    await fs.writeFile(
+      filePath + config.FILE_EXTENSION,
+      zippedInvalidFileContent,
+    );
     let error;
     try {
-      await service.decryptFile(password, filePath + '.enc');
+      await service.decryptFile(password, filePath + config.FILE_EXTENSION);
     } catch (e) {
       error = e;
     }

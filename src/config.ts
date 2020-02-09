@@ -7,4 +7,5 @@ export const config = {
   UTF8_ENCODING: 'utf8' as Utf8AsciiBinaryEncoding,
   CIPHER_ALGORITHM: 'aes-256-gcm',
   UTF8_FILE_ENCODING: 'utf-8',
+  FILE_EXTENSION: '.cmt',
 };

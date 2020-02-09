@@ -6,6 +6,7 @@ import * as zlib from 'zlib';
 import { EncryptTransform } from '../crypto/encrypt.transform';
 import { DecryptTransform } from '../crypto/decrypt.transform';
 import { Readable } from 'stream';
+import { config } from '../config';
 
 @Injectable()
 export class FileService {
@@ -50,7 +51,9 @@ export class FileService {
     const hash = await this.cryptoService.generateHash(password);
     return new Promise((resolve, reject) => {
       const encryptTransform = new EncryptTransform(this.cryptoService, hash);
-      const writeStream = fs.createWriteStream(path.join(filePath + '.enc'));
+      const writeStream = fs.createWriteStream(
+        path.join(filePath + config.FILE_EXTENSION),
+      );
       stream
         // .pipe(resultStream)
         .pipe(encryptTransform)

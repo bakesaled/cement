@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { CryptoService } from './crypto/crypto.service';
 import { FileService } from './file/file.service';
 import * as path from 'path';
+import { config } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,7 +27,10 @@ async function bootstrap() {
   await file.create(password, filePath, 'hello');
   console.log('file created');
   try {
-    const resultFile = await file.decryptFile(password, filePath + '.enc');
+    const resultFile = await file.decryptFile(
+      password,
+      filePath + config.FILE_EXTENSION,
+    );
     console.log('decrypted file', resultFile);
   } catch (e) {
     console.log('error decrypting', e);
