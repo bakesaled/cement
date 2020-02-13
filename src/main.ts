@@ -1,9 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { CryptoService } from './crypto/crypto.service';
-import { FileService } from './file/file.service';
+import { CryptoService, FileService, config } from '@bakesaled/cement';
 import * as path from 'path';
-import { config } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

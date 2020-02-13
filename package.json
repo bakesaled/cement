@@ -1,13 +1,13 @@
 {
-  "name": "cement",
+  "name": "@bakesaled/cement",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Encrypt/Decrypt files or strings.",
+  "author": "Brandon Eleuterio",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -26,7 +26,6 @@
     "argon2": "^0.25.1",
     "fs-extra": "^8.1.0",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^3.0.0",
     "rxjs": "^6.5.4"
   },
   "devDependencies": {
@@ -47,6 +46,7 @@
     "jest": "^24.9.0",
     "mock-fs": "^4.10.4",
     "prettier": "^1.18.2",
+    "rimraf": "^3.0.0",
     "supertest": "^4.0.2",
     "ts-jest": "25.1.0",
     "ts-loader": "^6.2.1",
@@ -60,12 +60,20 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "cmt/cement-lib/(.*)": "<rootDir>/libs/cement/src/$1",
+      "cmt/cement-lib": "<rootDir>/libs/cement/src"
+    }
   }
 }

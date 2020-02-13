@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CryptoService } from './crypto.service';
-import { EncryptedValueModel } from './encrypted-value.model';
+import { EncryptedValueModel } from '@bakesaled/cement';
 
 describe('CryptoService', () => {
   let service: CryptoService;

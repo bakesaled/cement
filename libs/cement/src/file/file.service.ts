@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CryptoService } from '../crypto/crypto.service';
+import { CryptoService, EncryptTransform, DecryptTransform } from '../crypto';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as zlib from 'zlib';
-import { EncryptTransform } from '../crypto/encrypt.transform';
-import { DecryptTransform } from '../crypto/decrypt.transform';
 import { Readable } from 'stream';
 import { config } from '../config';
 
@@ -55,7 +53,6 @@ export class FileService {
         path.join(filePath + config.FILE_EXTENSION),
       );
       stream
-        // .pipe(resultStream)
         .pipe(encryptTransform)
         .pipe(zlib.createGzip())
         .pipe(writeStream)

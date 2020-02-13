@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FileService } from './file.service';
-import { CryptoService } from '../crypto/crypto.service';
+import { CryptoService } from '@bakesaled/cement';
 import * as mock from 'mock-fs';
 import * as path from 'path';
 import * as fs from 'fs-extra';
