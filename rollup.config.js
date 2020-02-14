@@ -1,5 +1,7 @@
 import typescript from 'rollup-plugin-typescript2';
 import pkg from './package.json';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 
 export default {
   input: 'src/index.ts',
@@ -19,9 +21,17 @@ export default {
   ],
   external: [
     ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {})
+    ...Object.keys(pkg.peerDependencies || {}),
+    'stream',
+    'crypto',
+    'path',
+    'zlib'
   ],
   plugins: [
+    resolve({
+      preferBuiltins: true
+    }),
+    commonjs(),
     typescript({
       typescript: require('typescript'),
       clean: true,

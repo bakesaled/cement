@@ -3,6 +3,8 @@
 
 A tool that encrypts a file behind a password.
 
+[![Build Status](https://travis-ci.org/bakesaled/cement.svg?branch=master)](https://travis-ci.org/bakesaled/cement)
+
 ## Installation
 
 ```bash
