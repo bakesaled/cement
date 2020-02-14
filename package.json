@@ -24,7 +24,7 @@
     "start": "tsc-watch --onSuccess \"node ./dist/examples/index.js\"",
     "lint": "tslint -p tsconfig.json",
     "test": "jest",
-    "test:ci": "npm run test:coverage -- --runInBand --ci --logHeapUsage",
+    "test:ci": "npm run test:cov -- --runInBand --ci --logHeapUsage",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
