@@ -1,29 +1,28 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { FileService } from './file.service';
-import { CryptoService } from '@bakesaled/cement';
+
 import * as mock from 'mock-fs';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as zlib from 'zlib';
 import { config } from '../config';
+import { CryptoService } from '../crypto';
 
 describe('FileService', () => {
   let service: FileService;
+  let cryptoService: CryptoService;
   let tempPath;
 
   beforeEach(async () => {
     mock({
       temp: {
-        'super-test-file.cmt': 'test-file',
-      },
+        'super-test-file.cmt': 'test-file'
+      }
     });
     tempPath = path.join('temp');
     await fs.ensureDir(tempPath);
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [FileService, CryptoService],
-    }).compile();
 
-    service = module.get<FileService>(FileService);
+    cryptoService = new CryptoService();
+    service = new FileService(cryptoService);
   });
 
   afterEach(async () => {
@@ -42,7 +41,7 @@ describe('FileService', () => {
     await service.create(password, filePath, content);
     const result = await service.decryptFile(
       password,
-      filePath + config.FILE_EXTENSION,
+      filePath + config.FILE_EXTENSION
     );
     expect(result).toEqual(content);
   });
@@ -55,7 +54,7 @@ describe('FileService', () => {
     await service.encryptExistingFile(password, filePath);
     const result = await service.decryptFile(
       password,
-      filePath + config.FILE_EXTENSION,
+      filePath + config.FILE_EXTENSION
     );
     expect(result).toEqual(content);
   });
@@ -73,7 +72,7 @@ describe('FileService', () => {
     const zippedInvalidFileContent = zlib.gzipSync(invalidFileContent);
     await fs.writeFile(
       filePath + config.FILE_EXTENSION,
-      zippedInvalidFileContent,
+      zippedInvalidFileContent
     );
     let error;
     try {

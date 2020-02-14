@@ -57,7 +57,7 @@ export class EncryptedValueModel implements EncryptedValue {
       sourceParts[3], // hash
       Buffer.from(sourceParts[1], 'hex'), // iv
       Buffer.from(sourceParts[2], 'hex'), // tag
-      sourceParts[4], //value
+      sourceParts[4] // value
     );
   }
 

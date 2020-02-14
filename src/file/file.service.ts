@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { CryptoService, EncryptTransform, DecryptTransform } from '../crypto';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -6,7 +5,6 @@ import * as zlib from 'zlib';
 import { Readable } from 'stream';
 import { config } from '../config';
 
-@Injectable()
 export class FileService {
   constructor(private cryptoService: CryptoService) {}
   async create(password: string, filePath: string, content: string) {
@@ -44,13 +42,13 @@ export class FileService {
   private async encryptToFile(
     password: string,
     filePath: string,
-    stream: Readable,
+    stream: Readable
   ) {
     const hash = await this.cryptoService.generateHash(password);
     return new Promise((resolve, reject) => {
       const encryptTransform = new EncryptTransform(this.cryptoService, hash);
       const writeStream = fs.createWriteStream(
-        path.join(filePath + config.FILE_EXTENSION),
+        path.join(filePath + config.FILE_EXTENSION)
       );
       stream
         .pipe(encryptTransform)

@@ -1,16 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { CryptoService } from './crypto.service';
-import { EncryptedValueModel } from '@bakesaled/cement';
+import { EncryptedValueModel } from './encrypted-value.model';
 
 describe('CryptoService', () => {
   let service: CryptoService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [CryptoService],
-    }).compile();
-
-    service = module.get<CryptoService>(CryptoService);
+    service = new CryptoService();
   });
 
   it('should be defined', () => {
@@ -42,7 +37,7 @@ describe('CryptoService', () => {
     const hash = await service.generateHash(password);
     const encryptedValue: EncryptedValueModel = await service.encrypt(
       hash,
-      value,
+      value
     );
 
     const decryptedValue = await service.decrypt(hash, encryptedValue);

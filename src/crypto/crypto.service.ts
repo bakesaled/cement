@@ -1,10 +1,8 @@
-import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
 import { EncryptedValueModel } from './encrypted-value.model';
 import { config } from '../config';
 
-@Injectable()
 export class CryptoService {
   async generateHash(password: string) {
     const salt = crypto.randomBytes(config.KEY_LENGTH);
@@ -14,7 +12,7 @@ export class CryptoService {
       hash = await argon2.hash(password, {
         salt: salt,
         type: argon2.argon2i,
-        hashLength: config.KEY_LENGTH,
+        hashLength: config.KEY_LENGTH
       });
     } catch (e) {
       console.error('error', e);
@@ -44,12 +42,12 @@ export class CryptoService {
     const cipher = crypto.createCipheriv(
       config.CIPHER_ALGORITHM,
       Buffer.from(hashPart, config.BASE64_ENCODING),
-      iv,
+      iv
     );
     let result = cipher.update(
       value,
       config.UTF8_ENCODING,
-      config.BASE64_ENCODING,
+      config.BASE64_ENCODING
     );
     result += cipher.final(config.BASE64_ENCODING);
     const tag = (cipher as any).getAuthTag();
@@ -74,15 +72,15 @@ export class CryptoService {
       config.CIPHER_ALGORITHM,
       Buffer.from(
         EncryptedValueModel.extractHashPart(hash),
-        config.BASE64_ENCODING,
+        config.BASE64_ENCODING
       ),
-      iv,
+      iv
     );
     (decipher as any).setAuthTag(tag);
     let result = decipher.update(
       encryptedValue.value,
       config.BASE64_ENCODING,
-      config.UTF8_ENCODING,
+      config.UTF8_ENCODING
     );
     result += decipher.final(config.UTF8_ENCODING);
     return result.toString();

@@ -5,20 +5,17 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2017",
+    "target": "es5",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "paths": {
-      "@bakesaled/cement": [
-        "libs/cement/src"
-      ],
-      "@bakesaled/cement/*": [
-        "libs/cement/src/*"
-      ]
-    }
+    "typeRoots": ["node_modules/@types"],
+    "types": ["jest", "node"]
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist"
