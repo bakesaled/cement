@@ -27,7 +27,8 @@
     "test:ci": "npm run test:cov -- --runInBand --ci --logHeapUsage",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "argon2": "^0.25.1",
