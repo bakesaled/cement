@@ -1,6 +1,6 @@
 {
   "name": "@bakesaled/cement",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A library that encrypts and decrypt files or strings.",
   "author": "Brandon Eleuterio",
   "license": "MIT",
@@ -14,9 +14,14 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bakesaled/cement.git"
+  },
   "main": "dist/main.js",
   "module": "dist/main.es.js",
   "jsnext:main": "dist/index.es.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "rollup -c",
